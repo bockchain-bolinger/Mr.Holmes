@@ -5,6 +5,7 @@
 
 import os
 import shutil
+import subprocess
 from configparser import ConfigParser
 from Core.Support import Font
 from Core.Support import Language
@@ -31,6 +32,7 @@ class Downloader:
                    Font.Color.BLUE + "\n[+]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Update", "Insert", "None").format(Attempts) + "\n\n" + Font.Color.GREEN + "[#MR.HOLMES#]" + Font.Color.WHITE + "-->"))
             if Pass == Password:
                 Downloader.Update()
+                return
             else:
                 Attempts = Attempts - 1
                 print(Font.Color.RED + "\n[!]" + Font.Color.WHITE +
@@ -44,15 +46,16 @@ class Downloader:
         os.chdir(Path)
         if os.path.exists("Mr.Holmes_Old"):
             shutil.rmtree("Mr.Holmes_Old",)
-        if os.name == "nt":
-            os.system("rename Mr.Holmes Mr.Holmes_Old 2>NUL >NUL")
-        else:
-            os.system("mv Mr.Holmes Mr.Holmes_Old &>/dev/null")
-        os.system("git clone https://github.com/Lucksi/Mr.Holmes")
+        if os.path.exists("Mr.Holmes"):
+            shutil.move("Mr.Holmes", "Mr.Holmes_Old")
+        clone = subprocess.run(["git", "clone", "https://github.com/Lucksi/Mr.Holmes"], check=False)
+        if clone.returncode != 0:
+            print(Font.Color.RED + "\n[!]" + Font.Color.WHITE + "UPDATE FAILED: git clone error")
+            return
         choice = int(input(Font.Color.BLUE + "\n[+]" + Font.Color.WHITE +
                      Language.Translation.Translate_Language(filename, "Update", "Choice", "None")))
         if choice == 1:
-            os.remove("Mr.Holmes_Old")
+            shutil.rmtree("Mr.Holmes_Old", ignore_errors=True)
             print(Font.Color.WHITE + Language.Translation.Translate_Language(filename,
                   "Update", "Delete", "None"))
         else:
