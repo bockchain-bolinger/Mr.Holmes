@@ -3,11 +3,11 @@
 # Copyright (C) 2021-2023 Lucksi <lukege287@gmail.com>
 # License: GNU General Public License v3.0
 
-import requests
 import json
 from Core.Support import Font
 from Core.Support import Language
 from Core.Support import Headers
+from Core.Support import HttpClient
 
 filename = Language.Translation.Get_Language()
 filename
@@ -21,7 +21,7 @@ class Search:
         headers = Headers.Get.classic()
         if name == "Twitter":
             headers = Headers.Get.Twitter()
-        searcher = requests.get(
+        searcher = HttpClient.Client.get(
             url=site2, headers=headers, proxies=http_proxy, timeout=10, allow_redirects=True)
         f = open(report, "a")
         if error == "Status-Code":
