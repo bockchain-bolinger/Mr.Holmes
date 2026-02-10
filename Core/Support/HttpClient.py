@@ -9,31 +9,34 @@ from urllib3.util.retry import Retry
 
 
 class Client:
+    _session = None
 
     @staticmethod
     def session():
-        retry = Retry(
-            total=3,
-            connect=3,
-            read=3,
-            backoff_factor=0.5,
-            status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["GET", "HEAD"],
-            raise_on_status=False,
-        )
-        adapter = HTTPAdapter(max_retries=retry)
-        sess = requests.Session()
-        sess.mount("http://", adapter)
-        sess.mount("https://", adapter)
-        return sess
+        if Client._session is None:
+            retry = Retry(
+                total=3,
+                connect=3,
+                read=3,
+                backoff_factor=0.5,
+                status_forcelist=[429, 500, 502, 503, 504],
+                allowed_methods=["GET", "HEAD"],
+                raise_on_status=False,
+            )
+            adapter = HTTPAdapter(max_retries=retry)
+            sess = requests.Session()
+            sess.mount("http://", adapter)
+            sess.mount("https://", adapter)
+            Client._session = sess
+        return Client._session
 
     @staticmethod
     def get(url, headers=None, proxies=None, timeout=10, allow_redirects=True):
-        with Client.session() as sess:
-            return sess.get(
-                url=url,
-                headers=headers,
-                proxies=proxies,
-                timeout=timeout,
-                allow_redirects=allow_redirects,
-            )
+        sess = Client.session()
+        return sess.get(
+            url=url,
+            headers=headers,
+            proxies=proxies,
+            timeout=timeout,
+            allow_redirects=allow_redirects,
+        )
