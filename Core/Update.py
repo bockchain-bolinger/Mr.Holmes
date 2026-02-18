@@ -42,26 +42,37 @@ class Downloader:
 
     @staticmethod
     def Update():
-        Path = Parser["Settings"]["Path"]
-        os.chdir(Path)
-        if os.path.exists("Mr.Holmes_Old"):
-            shutil.rmtree("Mr.Holmes_Old",)
-        if os.path.exists("Mr.Holmes"):
-            shutil.move("Mr.Holmes", "Mr.Holmes_Old")
-        clone = subprocess.run(["git", "clone", "https://github.com/Lucksi/Mr.Holmes"], check=False)
-        if clone.returncode != 0:
-            print(Font.Color.RED + "\n[!]" + Font.Color.WHITE + "UPDATE FAILED: git clone error")
-            return
-        choice = int(input(Font.Color.BLUE + "\n[+]" + Font.Color.WHITE +
-                     Language.Translation.Translate_Language(filename, "Update", "Choice", "None")))
-        if choice == 1:
-            shutil.rmtree("Mr.Holmes_Old", ignore_errors=True)
-            print(Font.Color.WHITE + Language.Translation.Translate_Language(filename,
-                  "Update", "Delete", "None"))
-        else:
-            print(Font.Color.WHITE + Language.Translation.Translate_Language(filename,
-                  "Update", "Keep", "None"))
-        sleep(3)
-        print("\n")        
-        inp = input(Font.Color.WHITE + Language.Translation.Translate_Language(
-            filename, "Update", "Success", "None"))
+        path = Parser["Settings"]["Path"]
+        previous_cwd = os.getcwd()
+        moved_current = False
+
+        try:
+            os.chdir(path)
+            if os.path.exists("Mr.Holmes_Old"):
+                shutil.rmtree("Mr.Holmes_Old",)
+            if os.path.exists("Mr.Holmes"):
+                shutil.move("Mr.Holmes", "Mr.Holmes_Old")
+                moved_current = True
+
+            clone = subprocess.run(["git", "clone", "https://github.com/Lucksi/Mr.Holmes"], check=False)
+            if clone.returncode != 0:
+                print(Font.Color.RED + "\n[!]" + Font.Color.WHITE + "UPDATE FAILED: git clone error")
+                if moved_current and os.path.exists("Mr.Holmes_Old") and not os.path.exists("Mr.Holmes"):
+                    shutil.move("Mr.Holmes_Old", "Mr.Holmes")
+                return
+
+            choice = int(input(Font.Color.BLUE + "\n[+]" + Font.Color.WHITE +
+                         Language.Translation.Translate_Language(filename, "Update", "Choice", "None")))
+            if choice == 1:
+                shutil.rmtree("Mr.Holmes_Old", ignore_errors=True)
+                print(Font.Color.WHITE + Language.Translation.Translate_Language(filename,
+                      "Update", "Delete", "None"))
+            else:
+                print(Font.Color.WHITE + Language.Translation.Translate_Language(filename,
+                      "Update", "Keep", "None"))
+            sleep(3)
+            print("\n")
+            inp = input(Font.Color.WHITE + Language.Translation.Translate_Language(
+                filename, "Update", "Success", "None"))
+        finally:
+            os.chdir(previous_cwd)
