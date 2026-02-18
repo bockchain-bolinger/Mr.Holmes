@@ -203,7 +203,7 @@ class Config:
         alert = int(input(
             Font.Color.RED + "\n[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Configuration", "Update-Path", "Choice") + Font.Color.RED + "[!]" + Font.Color.GREEN + "\n\n[#MR.HOLMES#]" + Font.Color.WHITE + "-->"))
         if alert == 1:
-            if os.path.isfile:
+            if os.path.isfile(nomefile):
                 Parser = ConfigParser()
                 Parser.read(nomefile)
                 path = str(input(
@@ -237,7 +237,7 @@ class Config:
         alert = int(input(
             Font.Color.RED + "\n[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Configuration", "Password", "Choice2") + Font.Color.RED + "[!]" + Font.Color.GREEN + "\n\n[#MR.HOLMES#]" + Font.Color.WHITE + "-->"))
         if alert == 1:
-            if os.path.isfile:
+            if os.path.isfile(nomefile):
                 Parser = ConfigParser()
                 Parser.read(nomefile)
                 passw = getpass.getpass(

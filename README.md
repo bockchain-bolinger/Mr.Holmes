@@ -211,8 +211,7 @@ edit Language.json
 <br>
 
 # DEFAULT USERNAME AND PASSWORD:
-    Username:Admin
-    Password:Qwerty123
+    For security reasons, set your own credentials in `GUI/Credentials/Users.json` before exposing the GUI.
 
 <br>
 
