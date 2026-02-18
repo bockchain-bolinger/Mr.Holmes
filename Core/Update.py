@@ -44,6 +44,10 @@ class Downloader:
     def Update():
         path = Parser["Settings"]["Path"]
         previous_cwd = os.getcwd()
+
+        if not os.path.isdir(path):
+            print(Font.Color.RED + "\n[!]" + Font.Color.WHITE + "UPDATE FAILED: invalid update path")
+            return
         moved_current = False
 
         try:
@@ -54,9 +58,11 @@ class Downloader:
                 shutil.move("Mr.Holmes", "Mr.Holmes_Old")
                 moved_current = True
 
-            clone = subprocess.run(["git", "clone", "https://github.com/Lucksi/Mr.Holmes"], check=False)
+            clone = subprocess.run(["git", "clone", "https://github.com/Lucksi/Mr.Holmes"], check=False, capture_output=True, text=True)
             if clone.returncode != 0:
                 print(Font.Color.RED + "\n[!]" + Font.Color.WHITE + "UPDATE FAILED: git clone error")
+                if clone.stderr:
+                    print(Font.Color.RED + "[!]" + Font.Color.WHITE + clone.stderr.strip())
                 if moved_current and os.path.exists("Mr.Holmes_Old") and not os.path.exists("Mr.Holmes"):
                     shutil.move("Mr.Holmes_Old", "Mr.Holmes")
                 return

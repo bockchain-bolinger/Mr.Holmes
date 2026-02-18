@@ -22,7 +22,7 @@ class Search:
             return
 
         for current_tag in tag:
-            if current_tag in unique:
+            if current_tag in unique and current_tag not in most_tags:
                 most_tags.append(current_tag)
             if current_tag in tags:
                 if current_tag not in most_tags:
