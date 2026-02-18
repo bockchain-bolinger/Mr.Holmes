@@ -3,12 +3,13 @@
 # Copyright (C) 2021-2023 Lucksi <lukege287@gmail.com>
 # License: GNU General Public License v3.0
 
+ master
 from requests import exceptions as RequestExceptions
 from Core.Support import Font
 from Core.Support import Language
 from Core.Support import Headers
 from Core.Support import HttpClient
-from Core.Support import FileIO
+ master
 
 filename = Language.Translation.Get_Language()
 filename
@@ -59,7 +60,7 @@ class Search:
         headers = Headers.Get.classic()
         if name == "Twitter":
             headers = Headers.Get.Twitter()
-
+master
         try:
             searcher = HttpClient.Client.get(
                 url=site2, headers=headers, proxies=http_proxy, timeout=10, allow_redirects=True)
@@ -68,6 +69,7 @@ class Search:
                   Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None"))
             return
 
+ master
         if error == "Status-Code":
             if searcher.status_code == 200:
                 print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE +
@@ -85,7 +87,7 @@ class Search:
             else:
                 print(Font.Color.BLUE + "[N]" +
                       Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(searcher.status_code))
-
+master
         elif error == "Message":
             text = sites[data1]["text"]
             if text in searcher.text:

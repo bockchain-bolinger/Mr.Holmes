@@ -23,7 +23,7 @@ class Transfer:
         if os.path.exists(report):
             new = "Transfer/{}{}".format(name, extension)
             temp = "Transfer/file.txt"
-            qr_file = "QRCodes/QR.eps"
+
             process = None
             req = False
             try:
@@ -78,10 +78,7 @@ class Transfer:
             finally:
                 if process is not None and process.poll() is None:
                     process.terminate()
-                    try:
-                        process.wait(timeout=2)
-                    except subprocess.TimeoutExpired:
-                        process.kill()
+ master
                 if os.path.exists(new):
                     os.remove(new)
                 if os.path.exists(temp):
