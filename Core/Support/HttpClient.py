@@ -43,6 +43,17 @@ class Client:
             allow_redirects=allow_redirects,
         )
 
+    @staticmethod
+    def post(url, headers=None, data=None, timeout=None, allow_redirects=True):
+        sess = Client.session()
+        request_timeout = timeout if timeout is not None else Client.DEFAULT_TIMEOUT
+        return sess.post(
+            url=url,
+            headers=headers,
+            data=data,
+            timeout=request_timeout,
+            allow_redirects=allow_redirects,
+        )
 
     @staticmethod
     def reset_session():

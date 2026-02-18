@@ -4,10 +4,12 @@
 # License: GNU General Public License v3.0 
 
 import json
-import requests
+from requests import exceptions as RequestExceptions
 from Core.Support import Font
 from Core.Support import Language
 from Core.Support import Headers
+from Core.Support import HttpClient
+from Core.Support import FileIO
 from time import sleep
 import hashlib
 
@@ -20,20 +22,26 @@ headers = Headers.Get.classic()
 class List:
 
     @staticmethod
+    def _append_response(report, response):
+        with open(report, "a", encoding="utf-8") as report_file:
+            report_file.write("\n" + response)
+
+    @staticmethod
     def Spotify(report,email,name):
         print(Font.Color.GREEN + "\n[+]"+ Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "Check2", "None").format(email,name))
         url = "https://spclient.wg.spotify.com/signup/public/v1/account?validate=1&email={}".format(email)
-        req = requests.get(url=url,headers=headers)
-        sleep(3)
-        if 'errors' in req.text:
-            response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
-            print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name))
-        else:
-            response = Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name)
-            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name))
-        f = open(report,"a")
-        f.write("\n"+ response)
-        f.close()
+        try:
+            req = HttpClient.Client.get(url=url, headers=headers, timeout=10)
+            sleep(3)
+            if 'errors' in req.text:
+                response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
+                print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name))
+            else:
+                response = Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name)
+                print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name))
+            List._append_response(report, response)
+        except RequestExceptions.RequestException as e:
+            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(e))
 
     @staticmethod
     def Twitter(report,email,name):
@@ -41,7 +49,7 @@ class List:
         url = "https://api.twitter.com/i/users/email_available.json?email={}".format(email)
         sleep(3)
         try:
-            req = requests.get(url,headers=headers).text
+            req = HttpClient.Client.get(url=url, headers=headers, timeout=10).text
             parser = json.loads(req)
             output = parser["taken"]
             if output == False:
@@ -50,26 +58,27 @@ class List:
             elif output == True:
                 response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
                 print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name))
-            f = open(report,"a")
-            f.write("\n"+ response)
-            f.close()
+            List._append_response(report, response)
+        except RequestExceptions.RequestException as e:
+            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(e))
         except Exception as e:
             print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Error", "None") + str(e))
     
     @staticmethod
     def Gmail(report,email,name):
         url = "https://mail.google.com/mail/gxlu?email={}".format(email)
-        req = requests.get(url,headers)
-        sleep(3)
-        if 'Set-Cookie' in req.headers:
-            response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
-            print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name))
-        else:
-            response = Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name)
-            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name))
-        f = open(report,"a")
-        f.write("\n"+ response)
-        f.close()
+        try:
+            req = HttpClient.Client.get(url=url, headers=headers, timeout=10)
+            sleep(3)
+            if 'Set-Cookie' in req.headers:
+                response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
+                print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name))
+            else:
+                response = Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name)
+                print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name))
+            List._append_response(report, response)
+        except RequestExceptions.RequestException as e:
+            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(e))
     
     @staticmethod
     def Github(report,email,name):
@@ -80,27 +89,21 @@ class List:
         url = "https://api.github.com/search/users?q={}+in:email%22".format(email)
         sleep(3)
         try:
-            req = requests.get(url,headers=headers).text
+            req = HttpClient.Client.get(url=url, headers=headers, timeout=10).text
             parser = json.loads(req)
             output = parser["total_count"]
             if output == 0:
                 response = Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name)
                 print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name))
-                f = open(report,"a")
-                f.write("\n"+ response)
-                f.close()
+                List._append_response(report, response)
             elif output == 1:
                 response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
                 print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name) + "\n")
-                f = open(report,"a")
-                f.write("\n"+ response)
-                f.close()
+                List._append_response(report, response)
             elif output >1:
                 response = Language.Translation.Translate_Language(filename, "Email", "MultipleRes", "None").format(name,(str(output)))
                 print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE +  Language.Translation.Translate_Language(filename, "Email", "MultipleRes", "None").format(name,str(output)) + "\n")
-                f = open(report,"a")
-                f.write("\n"+ response)
-                f.close()
+                List._append_response(report, response)
             if output == 0:
                 pass
             else:
@@ -124,29 +127,22 @@ class List:
                 Link.append(link)
                 f.close()
                 if len(username):
-                    json_file = "GUI/Reports/E-Mail/{}/Github.json".format(email)
-                    f = open(json_file, "w")
-                    f.write('''{
-                                "List":[
-                                ]
-                            }''')
-                    f.close()
-
+                    json_file = "GUI/Reports/E-Mail/{}/Gravatar.json".format(email)
+                    payload = {"List": []}
                     i = 0
                     for image in Image:
-                        data2 = {
+                        payload["List"].append({
                             "username": "{}".format(username[i]),
+                            "name": "{}".format(Names[i]),
                             "site": "{}".format(Link[i]),
                             "image": "{}".format(image)
-                        }
-                        with open(json_file, 'r+') as file:
-                            file_data = json.load(file)
-                            file_data["List"].append(data2)
-                            file.seek(0)
-                            json.dump(file_data, file, indent=4)
-                        i = i +1
+                        })
+                        i = i + 1
+                    FileIO.Json.write_atomic(json_file, payload)
                 else:
                     pass
+        except RequestExceptions.RequestException as e:
+            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(e))
         except Exception as e:
             print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Error", "None") + str(e))
 
@@ -160,18 +156,14 @@ class List:
         print(Font.Color.GREEN + "\n[+]"+ Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "Check2", "None").format(email,name))
         url = "https://en.gravatar.com/{}.json".format(hashedemail)
         try:
-            req = requests.get(url,headers=headers)
+            req = HttpClient.Client.get(url=url, headers=headers, timeout=10)
             if "User not found" in req.text:
                 response = Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name)
-                f = open(report,"a")
-                f.write("\n"+ response)
-                f.close()
+                List._append_response(report, response)
                 print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "FalseRes", "None").format(name))
             else:
                 response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
-                f = open(report,"a")
-                f.write("\n"+ response)
-                f.close()
+                List._append_response(report, response)
                 print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name))
                 reader = req.text
                 converted = json.loads(reader)
@@ -226,7 +218,6 @@ class List:
                 f.write("PROFILE-PIC: {}\r\n".format(profile_pic))
                 print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + "PROFILE-LINK: {}".format(link))
                 f.write("PROFILE-LINK: {}\r\n".format(link))
-                f.close()
                 Image.append(profile_pic)
                 username.append(user)
                 Link.append(link)
@@ -234,29 +225,21 @@ class List:
                 f.close()
                 if len(username):
                     json_file = "GUI/Reports/E-Mail/{}/Gravatar.json".format(email)
-                    f = open(json_file, "w")
-                    f.write('''{
-                                "List":[
-                                ]
-                            }''')
-                    f.close()
-
+                    payload = {"List": []}
                     i = 0
                     for image in Image:
-                        data2 = {
+                        payload["List"].append({
                             "username": "{}".format(username[i]),
                             "name": "{}".format(Names[i]),
                             "site": "{}".format(Link[i]),
                             "image": "{}".format(image)
-                        }
-                        with open(json_file, 'r+') as file:
-                            file_data = json.load(file)
-                            file_data["List"].append(data2)
-                            file.seek(0)
-                            json.dump(file_data, file, indent=4)
-                        i = i +1
+                        })
+                        i = i + 1
+                    FileIO.Json.write_atomic(json_file, payload)
                 else:
                     pass
+        except RequestExceptions.RequestException as e:
+            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(e))
         except Exception as e:
             print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Error", "None") + str(e))
 
@@ -269,7 +252,7 @@ class List:
         url = "https://imgur.com/signin/ajax_email_available"
         sleep(3)
         try:
-            req = requests.post(url,headers=headers,data = data).text
+            req = HttpClient.Client.post(url=url, headers=headers, data=data, timeout=10).text
             parser = json.loads(req)
             output = parser["data"]["available"]
             if output == True:
@@ -278,9 +261,9 @@ class List:
             elif output == False:
                 response = Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name)
                 print(Font.Color.YELLOW + "[v]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Email", "TrueRes", "None").format(name))
-            f = open(report,"a")
-            f.write("\n"+ response)
-            f.close()
+            List._append_response(report, response)
+        except RequestExceptions.RequestException as e:
+            print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(e))
         except Exception as e:
             print(Font.Color.RED + "[!]" + Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Error", "None") + str(e))
      
