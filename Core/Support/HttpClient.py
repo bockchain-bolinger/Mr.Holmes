@@ -10,6 +10,7 @@ from urllib3.util.retry import Retry
 
 class Client:
     _session = None
+ master
 
     @staticmethod
     def session():
@@ -31,12 +32,9 @@ class Client:
         return Client._session
 
     @staticmethod
-    def get(url, headers=None, proxies=None, timeout=10, allow_redirects=True):
-        sess = Client.session()
+ master
         return sess.get(
             url=url,
             headers=headers,
             proxies=proxies,
-            timeout=timeout,
-            allow_redirects=allow_redirects,
-        )
+ master
