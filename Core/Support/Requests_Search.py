@@ -23,6 +23,7 @@ class Search:
             return
 
         for current_tag in tag:
+            if current_tag in unique:
             if current_tag in unique and current_tag not in most_tags:
                 most_tags.append(current_tag)
             if current_tag in tags:
@@ -60,6 +61,7 @@ class Search:
         headers = Headers.Get.classic()
         if name == "Twitter":
             headers = Headers.Get.Twitter()
+
 master
         try:
             searcher = HttpClient.Client.get(
@@ -87,6 +89,7 @@ master
             else:
                 print(Font.Color.BLUE + "[N]" +
                       Font.Color.WHITE + Language.Translation.Translate_Language(filename, "Default", "Connection_Error2", "None") + str(searcher.status_code))
+
 master
         elif error == "Message":
             text = sites[data1]["text"]
