@@ -4,7 +4,7 @@ Dieses Dokument beantwortet: **„Was steht noch aus?“**
 
 ## Bereits umgesetzt
 - Shell-Härtung in zentralen Pfaden (`subprocess` statt `os.system`) für Transfer/Update.
-- Zentraler HTTP-Client mit Retry/Backoff + Session-Reuse.
+- Zentraler HTTP-Client mit Retry/Backoff + Session-Reuse (bereits in Requests_Search und Mail/Lookup integriert).
 - `Requests_Search` mit robuster Fehlerbehandlung und reduzierter Duplikatlogik.
 - Atomare JSON-Schreibvorgänge für Such-Ergebnisse.
 - Konfigurations-Bugs bei `os.path.isfile(nomefile)` korrigiert.
@@ -29,7 +29,7 @@ Dieses Dokument beantwortet: **„Was steht noch aus?“**
 
 ### 3) Performance
 1. **HTTP-Client in weitere Module ausrollen**
-   - Noch viele direkte `requests.get(...)`-Aufrufe in Scrapern.
+   - Teilweise erledigt (Requests_Search, Mail/Lookup), aber noch offene direkte `requests.get(...)`-Aufrufe in weiteren Scrapern.
 2. **Parallelisierung I/O-lastiger Checks**
    - Konfigurierbare Worker-Limits + Backoff pro Host.
 
